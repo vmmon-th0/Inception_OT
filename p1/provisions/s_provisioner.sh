@@ -17,7 +17,7 @@ echo "[k42s] install packages"
 yum install net-tools
 
 echo "[k42s] k3s installation on node"
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip=192.168.56.110" K3S_KUBECONFIG_MODE="644" sh -s - --flannel-backend none --token 12345
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip=$MASTERNODE_IP --flannel-iface=eth1" K3S_KUBECONFIG_MODE="644" sh -s - --token 12345
 
 echo "[k42s] server token are shared via synced_folder technique"
 sudo cp /var/lib/rancher/k3s/server/token /home/vagrant/shared

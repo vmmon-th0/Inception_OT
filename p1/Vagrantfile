@@ -1,24 +1,37 @@
-Vagrant.configure("2") do |config|
-    config.vm.box = "centos/7"
+V_BOX = 'centos/7'
 
-    config.vm.provider "virtualbox" do |v|
-        v.cpus = 2
-        v.memory = 1024
+VM_PROVIDER = 'virtualbox'
+
+VB_CPU = 2
+VB_MEM = 2048
+
+MASTERNODE_MN = 'aschiffeS'
+WORKERNODE_MN = 'aschiffeSW'
+
+MASTERNODE_IP = '192.168.56.110'
+WORKERNODE_IP = '192.168.56.111'
+
+Vagrant.configure("2") do |config|
+    config.vm.box = V_BOX
+
+    config.vm.provider VM_PROVIDER do |v|
+        v.cpus = VB_CPU
+        v.memory = VB_MEM
     end
 
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
 
-    config.vm.define "aschiffeS" do |control|
-        control.vm.hostname = "aschiffeS"
-        control.vm.network "private_network", ip: "192.168.56.110"
-        control.vm.provision "shell", path: "provisions/s_provisioner.sh"
-        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: "virtualbox"
+    config.vm.define MASTERNODE_MN do |control|
+        control.vm.hostname = MASTERNODE_MN
+        control.vm.network "private_network", ip: MASTERNODE_IP
+        control.vm.provision "shell", path: "provisions/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
+        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: VM_PROVIDER
     end
 
-    config.vm.define "aschiffeSW" do |control|
-        control.vm.hostname = "aschiffeSW"
-        control.vm.network "private_network", ip: "192.168.56.111"
-        control.vm.provision "shell", path: "provisions/sw_provisioner.sh"
-        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: "virtualbox"
+    config.vm.define WORKERNODE_MN do |control|
+        control.vm.hostname = WORKERNODE_MN
+        control.vm.network "private_network", ip: WORKERNODE_IP
+        control.vm.provision "shell", path: "provisions/sw_provisioner.sh", env: { "WORKERNODE_IP" => WORKERNODE_IP }
+        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: VM_PROVIDER
     end
 end

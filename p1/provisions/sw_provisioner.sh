@@ -19,4 +19,4 @@ echo "[k42s] install packages"
 yum install net-tools
 
 echo "[k42s] k3s installation on node"
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 --token-file /home/vagrant/shared/token --node-ip=192.168.56.111" K3S_KUBECONFIG_MODE="644" sh -s -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 --token-file /home/vagrant/shared/token --node-ip=$WORKERNODE_IP --flannel-iface=eth1" K3S_KUBECONFIG_MODE="644" sh -s -
