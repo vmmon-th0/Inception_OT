@@ -1,0 +1,26 @@
+V_BOX = 'centos/7'
+
+VM_PROVIDER = 'virtualbox'
+
+VB_CPU = 2
+VB_MEM = 2048
+
+MASTERNODE_MN = 'aschiffeS'
+MASTERNODE_IP = '192.168.56.110'
+
+Vagrant.configure("2") do |config|
+    config.vm.box = V_BOX
+
+    config.vm.provider VM_PROVIDER do |v|
+        v.cpus = VB_CPU
+        v.memory = VB_MEM
+    end
+
+    config.vbguest.installer_options = { allow_kernel_upgrade: true }
+
+    config.vm.define MASTERNODE_MN do |control|
+        control.vm.hostname = MASTERNODE_MN
+        control.vm.network "private_network", ip: MASTERNODE_IP
+        control.vm.provision "shell", path: "provisions/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
+    end
+end
