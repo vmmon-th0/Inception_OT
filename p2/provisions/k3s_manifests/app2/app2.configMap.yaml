@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nginx-html
+  name: nginx-html-app2
 data:
   index.html: |
     <!DOCTYPE html>

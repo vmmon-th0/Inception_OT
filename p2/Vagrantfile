@@ -1,4 +1,4 @@
-V_BOX = 'centos/7'
+V_BOX = 'generic/centos8'
 
 VM_PROVIDER = 'virtualbox'
 

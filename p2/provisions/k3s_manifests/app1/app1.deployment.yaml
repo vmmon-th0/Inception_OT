@@ -25,6 +25,6 @@ spec:
       volumes:
       - name: html-volume
         configMap:
-          name: nginx-html
+          name: nginx-html-app1
           defaultMode: 0644 # file owner can read and write (6), group members and other users can only read (4).
 
