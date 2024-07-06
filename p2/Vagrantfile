@@ -22,6 +22,6 @@ Vagrant.configure("2") do |config|
         control.vm.hostname = MASTERNODE_MN
         control.vm.network "private_network", ip: MASTERNODE_IP
         control.vm.synced_folder "./provisions/k3s_manifests", "/home/vagrant/shared", type: VM_PROVIDER
-        control.vm.provision "shell", path: "provisions/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
+        control.vm.provision "shell", path: "provisions/scripts/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
     end
 end

@@ -12,27 +12,31 @@ MASTERNODE_IP = '192.168.56.110'
 WORKERNODE_IP = '192.168.56.111'
 
 Vagrant.configure("2") do |config|
-    config.vm.box = V_BOX
+  config.vm.box = V_BOX
 
-    config.vm.provider VM_PROVIDER do |v|
-        v.cpus = VB_CPU
-        v.memory = VB_MEM
-    end
+  config.vm.provider VM_PROVIDER do |v|
+    v.cpus = VB_CPU
+    v.memory = VB_MEM
+  end
 
-    config.vbguest.installer_options = { allow_kernel_upgrade: true }
+  config.trigger.before :up do |trigger|
+    trigger.run = { inline: "mkdir -p shared" }
+  end
 
-    config.vm.define MASTERNODE_MN do |control|
-        control.vm.hostname = MASTERNODE_MN
-        control.vm.network "private_network", ip: MASTERNODE_IP
-        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: VM_PROVIDER
-        control.vm.provision "shell", path: "provisions/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
-    end
+  config.vbguest.installer_options = { allow_kernel_upgrade: true }
 
-    config.vm.define WORKERNODE_MN do |control|
-        control.vm.hostname = WORKERNODE_MN
-        control.vm.network "private_network", ip: WORKERNODE_IP
-        control.vm.synced_folder "./provisions/shared", "/home/vagrant/shared", type: VM_PROVIDER
-        control.vm.provision "shell", path: "provisions/sw_provisioner.sh", env: { "WORKERNODE_IP" => WORKERNODE_IP,
-                                                                                   "MASTERNODE_IP" => MASTERNODE_IP }
-    end
+  config.vm.define MASTERNODE_MN do |control|
+    control.vm.hostname = MASTERNODE_MN
+    control.vm.network "private_network", ip: MASTERNODE_IP
+    control.vm.synced_folder "./shared", "/home/vagrant/shared", type: VM_PROVIDER
+    control.vm.provision "shell", path: "scripts/s_provisioner.sh", env: { "MASTERNODE_IP" => MASTERNODE_IP }
+  end
+
+  config.vm.define WORKERNODE_MN do |control|
+    control.vm.hostname = WORKERNODE_MN
+    control.vm.network "private_network", ip: WORKERNODE_IP
+    control.vm.synced_folder "./shared", "/home/vagrant/shared", type: VM_PROVIDER
+    control.vm.provision "shell", path: "scripts/sw_provisioner.sh", env: { "WORKERNODE_IP" => WORKERNODE_IP,
+                                                                            "MASTERNODE_IP" => MASTERNODE_IP }
+  end
 end

@@ -6,9 +6,15 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vmmon-th0/argo_watcher
+    repoURL: https://github.com/vmmon-th0/argo_watcher.git
     targetRevision: HEAD
     path: ./
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true
