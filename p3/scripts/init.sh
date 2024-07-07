@@ -5,10 +5,9 @@ set -e
 # KUBECTL, https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 
 function install_kubectl {
-
     if command -v kubectl &> /dev/null; then
         echo "kubectl is already installed"
-#         kubectl version
+        kubectl version
     else
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
@@ -25,7 +24,6 @@ function install_kubectl {
 # DOCKER, https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
 
 function install_docker {
-
     if command -v docker &> /dev/null; then
         echo "Docker is already installed"
         docker --version
@@ -114,7 +112,7 @@ function deploy_argoCD {
 }
 
 function clean_up {
-
+    # Delete output files
     rm -f ./port-forwarding.log
     rm -f ./argo-credentials.txt
 
