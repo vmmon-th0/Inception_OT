@@ -20,9 +20,3 @@ sudo apt install virtualbox-7.0
 sudo usermod -G vboxusers -a $USER
 sudo /etc/init.d/vboxdrv setup
 sudo apt install --reinstall linux-headers-$(uname -r) virtualbox-dkms dkms
-
-echo "[IOT] install kubectl"
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-
-echo "[IOT] install k3d"
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
