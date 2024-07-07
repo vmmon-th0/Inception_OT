@@ -14,7 +14,7 @@ echo "[k42s] firewalld disabled"
 systemctl disable firewalld --now
 
 echo "[k42s] install packages"
-sudo yum upgrade
+sudo yum upgrade -y
 sudo yum install -y net-tools
 
 echo "[k42s] k3s installation on node"
