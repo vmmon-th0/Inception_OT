@@ -43,6 +43,7 @@ function install_docker {
         sudo addgroup --system docker
         sudo adduser $USER docker
         newgrp docker
+        sudo setfacl -m "g:docker:rw" /var/run/docker.sock
 
         # sudo chmod 660 /var/run/docker.sock
     fi
