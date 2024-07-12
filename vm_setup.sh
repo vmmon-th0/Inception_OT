@@ -1,15 +1,22 @@
+#!/bin/bash
+
+set -e
+
 echo "[IOT] update upgrade"
 sudo apt update && sudo apt upgrade
 
 echo "[IOT] install git"
 sudo apt install git
 
-echo "[IOT] vagrant git"
+echo "[IOT] install curl"
+sudo apt install curl
+
+echo "[IOT] install vagrant"
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 sudo apt update && sudo apt install vagrant
 
-echo "[IOT] install vb-guest plugin"
+echo "[IOT] install vagrant-vbguest"
 vagrant plugin install vagrant-vbguest
 
 echo "[IOT] install virtualbox with additional dkms"

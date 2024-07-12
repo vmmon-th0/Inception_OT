@@ -3,26 +3,21 @@
 set -e
 
 # KUBECTL, https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-
 function install_kubectl {
     if command -v kubectl &> /dev/null; then
         echo "kubectl is already installed"
-        kubectl version
+        kubectl version --client
     else
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-
-        # OPTIONAL
+        # checksum verification
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
         echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
-
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-
         kubectl version --client
     fi
 }
 
 # DOCKER, https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
-
 function install_docker {
     if command -v docker &> /dev/null; then
         echo "Docker is already installed"
@@ -43,8 +38,11 @@ function install_docker {
         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
         sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt-get update
-
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
+        newgrp docker
     fi
 }
 
@@ -58,74 +56,44 @@ function install_k3d {
     fi
 }
 
-function get_argo_pass {
-    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > ./argo-credentials.txt
+function init_cluster {
+    local CLUSTER_NAME="iot-cluster"
+    k3d cluster create $CLUSTER_NAME --port 8081:30080@loadbalancer
+    kubectl config use-context k3d-$CLUSTER_NAME
+    echo "The cluster '$CLUSTER_NAME' was successfully initialized and set to kubectl context"
 }
 
 function init_argoCD {
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-    sleep 20
-}
-
-function init_cluster {
-    k3d cluster create iot-cluster
-    echo "The cluster \"iot-cluster\" was successfully initialized"
-}
-
-function launch_argoCD_UI {
-    echo "Waiting for kubernetes services to start..."
-
     local NAMESPACE="argocd"
-    local ALL_READY=false
 
-    while ! $ALL_READY; do
-        local PODS=$(kubectl get pods -n $NAMESPACE --no-headers)
-        local ALL_READY=true
+    kubectl create namespace $NAMESPACE
+    kubectl apply -n $NAMESPACE -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    sleep 20
+    kubectl wait --for=condition=ready pod --all --namespace=$NAMESPACE --timeout=600s
 
-        while IFS= read -r pod; do
-            local POD_NAME=$(echo $pod | awk '{print $1}')
-            local POD_STATUS=$(echo $pod | awk '{print $3}')
-
-            if [[ -z "$POD_NAME" ]]; then
-                continue
-            fi
-
-            if [[ $POD_STATUS != "Running" && $POD_STATUS != "Completed" ]]; then
-                echo "The pod '$POD_NAME' in the namespace '$NAMESPACE' is not in 'Ready' state."
-                ALL_READY=false
-            fi
-        done <<< $PODS
-
-        if ! $ALL_READY; then
-            echo "Some pods in the namespace '$NAMESPACE' are not in 'Ready' state. Wait before checking again..."
-            sleep 10
-        fi
-    done
-
-    kubectl port-forward -n argocd svc/argocd-server 8080:443 > port-forward.log 2>&1 &
-    echo "Port forwarding has been successfully completed, the Argo CD UI is now available from your host machine"
-}
-
-function deploy_argoCD {
-    kubectl apply -f /home/vmmon/Desktop/Inception_OT/p3/confs/application.yaml
+    if [ $? -eq 0 ]; then
+        kubectl apply -f /home/vmmon/Desktop/Inception_OT/p3/confs/application.yaml
+        echo "ArgoCD was successfully deployed."
+        kubectl port-forward -n $NAMESPACE svc/argocd-server 8080:443 > argocd-port-forwarding.log 2>&1 &
+        echo "Port forwarding has been successfully completed, the Argo CD UI is now available from your host machine"
+        kubectl -n $NAMESPACE get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > ./argo-credentials.txt
+        echo "Output location of ArgoCD initial admin secret: ./argo-credentials.txt"
+    else
+        echo "Timeout ! Some pods in the namespace $NAMESPACE are not ready. Please check the pod status."
+    fi
 }
 
 function clean_up {
     # Delete output files
-    rm -f ./port-forwarding.log
     rm -f ./argo-credentials.txt
+    rm -f ./argocd-port-forwarding.log
 
     # Delete all ressource in all namespaces
     kubectl delete all --all --all-namespaces
     kubectl delete configmap --all --all-namespaces
     kubectl delete secret --all --all-namespaces
     kubectl delete pvc --all --all-namespaces
-    kubectl delete service --all --all-namespaces
     kubectl delete ingress --all --all-namespaces
-    kubectl delete deployment --all --all-namespaces
-    kubectl delete statefulset --all --all-namespaces
-    kubectl delete daemonset --all --all-namespaces
 
     # Delete cluster k3d
     k3d cluster delete --all
@@ -134,7 +102,6 @@ function clean_up {
 }
 
 # List all ressources for user information
-kubectl get all --all-namespaces
 read -p "Do you want to run the clean_up function ? (y/n): " user_input
 
 if [[ $user_input == "y" || $user_input == "Y" ]]; then
@@ -148,6 +115,3 @@ install_docker
 install_k3d
 init_cluster
 init_argoCD
-launch_argoCD_UI
-get_argo_pass
-deploy_argoCD
