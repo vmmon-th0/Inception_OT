@@ -25,5 +25,5 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] 
 sudo apt update
 sudo apt install virtualbox-7.0
 sudo usermod -G vboxusers -a $USER
-sudo /etc/init.d/vboxdrv setup
 sudo apt install --reinstall linux-headers-$(uname -r) virtualbox-dkms dkms
+sudo /etc/init.d/vboxdrv setup
