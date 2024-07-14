@@ -72,7 +72,7 @@ function init_argoCD {
     kubectl wait --for=condition=ready pod --all --namespace=$NAMESPACE --timeout=600s
 
     if [ $? -eq 0 ]; then
-        kubectl apply -f /home/vmmon/Desktop/Inception_OT/p3/confs/application.yaml
+        kubectl apply -f ../confs/application.yaml
         echo "ArgoCD was successfully deployed."
         kubectl port-forward -n $NAMESPACE svc/argocd-server 8080:443 > argocd-port-forwarding.log 2>&1 &
         echo "Port forwarding has been successfully completed, the Argo CD UI is now available from your host machine"

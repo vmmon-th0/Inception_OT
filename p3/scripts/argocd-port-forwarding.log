@@ -1,0 +1,19 @@
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+Handling connection for 8080
+E0713 20:14:47.075431   49243 portforward.go:398] error copying from local connection to remote stream: writeto tcp4 127.0.0.1:8080->127.0.0.1:34214: read tcp4 127.0.0.1:8080->127.0.0.1:34214: read: connection reset by peer
+Handling connection for 8080
+E0713 20:14:47.083600   49243 portforward.go:398] error copying from local connection to remote stream: writeto tcp4 127.0.0.1:8080->127.0.0.1:34238: read tcp4 127.0.0.1:8080->127.0.0.1:34238: read: connection reset by peer
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+E0714 13:04:37.280162   49243 portforward.go:385] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:48104: write tcp4 127.0.0.1:8080->127.0.0.1:48104: write: broken pipe
+E0714 13:04:45.844933   49243 portforward.go:385] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:48132: write tcp4 127.0.0.1:8080->127.0.0.1:48132: write: broken pipe
+Handling connection for 8080
+E0714 13:04:55.089727   49243 portforward.go:385] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:34266: write tcp4 127.0.0.1:8080->127.0.0.1:34266: write: broken pipe
+E0714 13:04:55.091662   49243 portforward.go:385] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:47652: write tcp4 127.0.0.1:8080->127.0.0.1:47652: write: broken pipe
