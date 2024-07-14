@@ -41,8 +41,6 @@ function install_docker {
         sudo adduser $USER docker
         newgrp docker
         sudo setfacl -m "g:docker:rw" /var/run/docker.sock
-
-        # sudo chmod 660 /var/run/docker.sock
     fi
 }
 
@@ -74,9 +72,9 @@ function init_argoCD {
     if [ $? -eq 0 ]; then
         kubectl apply -f ../confs/application.yaml
         echo "ArgoCD was successfully deployed."
-        kubectl port-forward -n $NAMESPACE svc/argocd-server 8080:443 > argocd-port-forwarding.log 2>&1 &
+        kubectl port-forward -n $NAMESPACE svc/argocd-server 8080:443 > /tmp/argocd-port-forwarding.log 2>&1 &
         echo "Port forwarding has been successfully completed, the Argo CD UI is now available from your host machine"
-        kubectl -n $NAMESPACE get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > ./argo-credentials.txt
+        kubectl -n $NAMESPACE get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > /tmp/argo-credentials.txt
         echo "Output location of ArgoCD initial admin secret: ./argo-credentials.txt"
     else
         echo "Timeout ! Some pods in the namespace $NAMESPACE are not ready. Please check the pod status."
@@ -84,9 +82,6 @@ function init_argoCD {
 }
 
 function clean_up {
-    # Delete output files
-    rm -f ./argo-credentials.txt
-    rm -f ./argocd-port-forwarding.log
 
     # Delete all ressource in all namespaces
     kubectl delete all --all --all-namespaces
@@ -101,7 +96,6 @@ function clean_up {
     echo "The total clean up was done successfully"
 }
 
-# List all ressources for user information
 read -p "Do you want to run the clean_up function ? (y/n): " user_input
 
 if [[ $user_input == "y" || $user_input == "Y" ]]; then
